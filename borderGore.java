@@ -39,7 +39,6 @@ public class borderGore {
 		width = (int) screenSize.getWidth();
 		height = (int) screenSize.getHeight();
 		
-		
 		//helper popup
 		JFrame pop = new JFrame("Map Creation");
 		pop.setPreferredSize(new Dimension(800,200));
@@ -72,7 +71,6 @@ public class borderGore {
 		//Button to take in the inputs and creates map using them
 		JButton go = new JButton("Go!");
 		go.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				int cleanNum = Integer.parseInt(cleanUpRateField.getText());
@@ -101,6 +99,7 @@ public class borderGore {
 
 					@Override
 					public void mousePressed(MouseEvent arg0) {
+						//When pressed, create a new random map using the same variables
 						frame.remove(rr);
 						rr = createRectangle(width, height, moveNum, cleanNum, countries, changeWater);
 						frame.add(rr);
@@ -123,32 +122,43 @@ public class borderGore {
 		
 	}
 	
-	public static Rectangles createRectangle(int width, int height, int count, 
-			int cleanNumber, int numCountries, boolean changeWater) {
+	/**
+	 * This method uses every parameter to create a randomized 2D array of Strings
+	 * that represent a map. With a 2D array and a Map from Strings to Colors, a
+	 * Rectangles class is created and returned.
+	 * @param width int representing the width of the screen
+	 * @param height int representing the height of the screen
+	 * @param moveNum int representing the amount of random movements
+	 * @param cleanNumber int representing the clean method is used
+	 * @param numDraws int representing the number of Colors that are allowed random movement
+	 * @param changeWater boolean representing whether or not to "clean" the water Strings
+	 * @return a Rectangles class used to draw out the map
+	 */
+	public static Rectangles createRectangle(int width, int height, int moveNum, 
+			int cleanNumber, int numDraws, boolean changeWater) {
 		String[][] map;
 		Map<String, Color> mapColoring = new HashMap<String, Color>();
 		map = new String[(height - 50) / 20][width / 20];
 		addWater(map);
 		mapColoring.put("W", Color.BLUE);
 		
-		
-		//int count = map.length * map[0].length ;
-		for(int i =0; i<numCountries; i++){
-			addCountry(map, Integer.toString(i),count);
-			mapColoring.put(Integer.toString(i), colors[i%colors.length]);
+		for(int i =0; i<numDraws; i++){
+			addCountry(map, Integer.toString(i%colors.length),moveNum);
+			
+			if(i<colors.length) {
+				mapColoring.put(Integer.toString(i), colors[i]);
+			}
 		}
 		
-		//int cleanNumber =4;
 		for(int i =0; i< cleanNumber; i++) {
 			cleanUpNearestNeighbor(map, changeWater);
 		}
 		
-		Rectangles r = new Rectangles(map, mapColoring);
-		return r;
+		return new Rectangles(map, mapColoring);
 	}
 	
 	/**
-	 * Completely fills up the 2D String array with "water"
+	 * Completely fills up the 2D String array with "water" String
 	 * @param m a 2D array of Strings of any size
 	 */
 	public static void addWater(String[][] m){
@@ -170,6 +180,7 @@ public class borderGore {
 		int jj = getRandomNumberInRange(0, m[0].length - 1);
 		m[ii][jj] = border;
 		
+		//random walk
 		while (count >= 0) {
 			int k = getRandomNumberInRange(1, 4);
 			if (k == 1)
